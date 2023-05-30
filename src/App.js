@@ -1,25 +1,71 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react"
+import './todo-app.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+export default function App(){
+    return (
+        <div className="App">
+            <TodoList />
+        </div>
+    )
 }
 
-export default App;
+function TodoList(){
+    const [tasks, setTasks] = useState([])
+    const [todoItem, setTodoItem] = useState('')
+
+    const addTask = ()=>{
+        setTasks([
+            ...tasks,
+            {
+                id: tasks.length +1,
+                task: todoItem,
+                completed: false,
+            }
+        ])
+        setTodoItem('')
+    }
+
+    const removeTask= (id) =>{
+        setTasks(tasks.filter(task=> task.id !== id))
+    }
+    const updateTaskStatus = (passedTask)=>{
+        setTasks(tasks.map((task)=>{
+            if(task.id == passedTask.id){
+                task.completed = !task.completed
+                return task
+            }
+            return task
+        }))
+    }
+
+    return(
+        <div className="todo-list">
+            <h1>
+                Todo List
+            </h1>
+            <input onChange={(e)=> setTodoItem(e.target.value)} value={todoItem}/>
+            <button className="add-button" onClick={addTask}>Add a task</button>
+            {tasks.map(task=>(
+                <TodoItem
+                task={task}
+                removeTask={removeTask}
+                updateTaskStatus ={updateTaskStatus}
+                />
+            ))} 
+        </div>
+    )
+}
+
+function TodoItem({task, removeTask, updateTaskStatus}){
+    return(
+        <div className={`todo-item ${task.completed ? 'completed': ''}`}>
+            <span>{task.task}</span>
+            <div>
+                <input type="checkbox" onChange={()=>updateTaskStatus(task)} checked={task.completed}/>
+                <button className="remove-button" onClick={()=> removeTask(task.id)}>Delete Task</button>
+            </div>
+            
+        </div>
+    )
+}
